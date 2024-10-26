@@ -11,6 +11,7 @@ import br.edu.utfpr.trabalhofinal.data.TipoContaEnum
 import br.edu.utfpr.trabalhofinal.ui.Arguments
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class FormularioContaViewModel(
     savedStateHandle: SavedStateHandle
@@ -112,9 +113,11 @@ class FormularioContaViewModel(
             state = state.copy(
                 salvando = true
             )
+            var formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+            var date = LocalDate.parse(state.data.valor, formatter)
             val conta = state.conta.copy(
                 descricao = state.descricao.valor,
-                data = LocalDate.parse(state.data.valor),
+                data = date,
                 valor = BigDecimal(state.valor.valor),
                 paga = state.paga,
                 tipo = TipoContaEnum.valueOf(state.tipo.valor)
