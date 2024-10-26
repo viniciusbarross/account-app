@@ -120,7 +120,7 @@ class FormularioContaViewModel(
                 data = date,
                 valor = BigDecimal(state.valor.valor),
                 paga = state.paga,
-                tipo = TipoContaEnum.valueOf(state.tipo.valor)
+                tipo = if(state.tipo.valor == "Despesa"){TipoContaEnum.DESPESA}else{TipoContaEnum.RECEITA}
             )
             ContaDatasource.instance.salvar(conta)
             state = state.copy(
