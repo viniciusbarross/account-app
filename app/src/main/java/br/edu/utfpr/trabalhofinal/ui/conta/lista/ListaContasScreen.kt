@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.ThumbDownOffAlt
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -77,6 +79,7 @@ fun ListaContasScreen(
             }
         ) { paddingValues ->
             val modifierWithPadding = Modifier.padding(paddingValues)
+                .padding(bottom = 16.dp)
             if (viewModel.state.contas.isEmpty()) {
                 ListaVazia(modifier = modifierWithPadding.fillMaxSize())
             } else {
@@ -164,10 +167,37 @@ private fun List(
 ) {
     LazyColumn(modifier = modifier) {
         items(contas) { conta ->
-            val descricao = "${conta.data.formatar()} - ${conta.descricao}"
             ListItem(
-                modifier = Modifier.clickable { onContaPressed(conta) },
-                headlineContent = { Text(descricao) },
+                modifier = Modifier
+                    .clickable { onContaPressed(conta) }
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                leadingContent = {
+                    Icon(
+                        imageVector = if (conta.paga) Icons.Filled.ThumbUp else Icons.Filled.ThumbDownOffAlt,
+                        contentDescription = if (conta.paga) "Conta paga" else "Conta não paga",
+                        tint = if (conta.tipo == TipoContaEnum.DESPESA) Color(0xFFCF5355) else Color(0xFF00984E)
+                    )
+                },
+                headlineContent = {
+                    Text(conta.descricao)
+                },
+                supportingContent = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = conta.data.formatar(),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            text = if (conta.tipo == TipoContaEnum.DESPESA) "-${conta.valor.formatar()}" else conta.valor.formatar(),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (conta.tipo == TipoContaEnum.DESPESA) Color(0xFFCF5355) else Color(0xFF00984E)
+                        )
+                    }
+                }
             )
         }
     }
@@ -189,6 +219,8 @@ private fun BottomBar(
     modifier: Modifier = Modifier,
     contas: List<Conta>
 ) {
+    val saldo = contas.calcularSaldo()
+    val projecao = contas.calcularProjecao()
     Column(
         modifier = modifier
             .background(color = MaterialTheme.colorScheme.secondaryContainer),
@@ -196,17 +228,18 @@ private fun BottomBar(
         Totalizador(
             modifier = Modifier.padding(top = 20.dp),
             titulo = stringResource(R.string.saldo),
-            valor = contas.calcularSaldo(),
-            textColor = MaterialTheme.colorScheme.secondary
+            valor = saldo,
+            textColor = if (saldo < BigDecimal.ZERO) Color(0xFFCF5355) else Color(0xFF00984E)
         )
         Totalizador(
             modifier = Modifier.padding(bottom = 20.dp),
             titulo = stringResource(R.string.previsao),
-            valor = contas.calcularProjecao(),
-            textColor = MaterialTheme.colorScheme.secondary
+            valor = projecao,
+            textColor = if (projecao < BigDecimal.ZERO) Color(0xFFCF5355) else Color(0xFF00984E)
         )
     }
 }
+
 
 @Composable
 fun Totalizador(

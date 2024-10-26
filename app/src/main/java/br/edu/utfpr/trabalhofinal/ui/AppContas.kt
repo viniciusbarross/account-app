@@ -1,7 +1,9 @@
 package br.edu.utfpr.trabalhofinal.ui
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -38,6 +40,7 @@ fun AppContas(
     ) {
         composable(route = Routes.LISTA_CONTAS) {
             ListaContasScreen(
+                modifier = modifier.padding(bottom = 32.dp),
                 onAdicionarPressed = {
                     navController.navigate(Screens.FORMULARIO_CONTA)
                 },
