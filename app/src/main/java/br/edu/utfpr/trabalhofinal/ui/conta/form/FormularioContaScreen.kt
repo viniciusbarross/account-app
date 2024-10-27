@@ -208,25 +208,61 @@ private fun FormContent(
             .padding(all = 16.dp)
             .imePadding()
             .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.Start
     ) {
-        FormTextField(
-            titulo = stringResource(R.string.descricao),
-            campoFormulario = descricao,
-            onValorAlterado = onDescricaoAlterada,
-            enabled = !processando
-        )
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        // Campo de Descrição
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Icon(
-                imageVector = Icons.Filled.CalendarMonth,
-                contentDescription = stringResource(R.string.data),
+                imageVector = Icons.AutoMirrored.Filled.Notes,
+                contentDescription = stringResource(R.string.descricao),
                 tint = MaterialTheme.colorScheme.outline
             )
+            Spacer(modifier = Modifier.size(8.dp))
+            FormTextField(
+                titulo = stringResource(R.string.descricao),
+                campoFormulario = descricao,
+                onValorAlterado = onDescricaoAlterada,
+                enabled = !processando,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.size(16.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Filled.AttachMoney,
+                contentDescription = stringResource(R.string.valor),
+                tint = MaterialTheme.colorScheme.outline
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            FormTextField(
+                titulo = stringResource(R.string.valor),
+                campoFormulario = valor,
+                onValorAlterado = onValorAlterado,
+                enabled = !processando,
+                modifier = Modifier.weight(1f),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.size(16.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Spacer(modifier = Modifier.size(32.dp))
             FormDatePicker(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.fillMaxWidth(),
                 campoFormulario = data,
                 onValorAlterado = onDataAlterada,
                 calendar = calendar,
@@ -234,32 +270,27 @@ private fun FormContent(
             )
         }
 
-        FormTextField(
-            titulo = stringResource(R.string.valor),
-            campoFormulario = valor,
-            onValorAlterado = onValorAlterado,
-            enabled = !processando
-        )
+        Spacer(modifier = Modifier.size(16.dp))
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            modifier = Modifier.fillMaxWidth().padding(start = 16.dp)
         ) {
             FormCheckbox(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.padding(end = 16.dp),
                 checked = paga,
                 onCheckChanged = onStatusPagamentoAlterado,
                 enabled = !processando,
                 label = stringResource(R.string.paga)
             )
-
         }
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            modifier = Modifier.fillMaxWidth().padding(start = 16.dp)
         ) {
             RadioButton(
+
                 selected = tipo.valor == "Receita",
                 onClick = { onTipoAlterado("Receita") },
                 enabled = !processando
@@ -272,6 +303,7 @@ private fun FormContent(
                 enabled = !processando
             )
             Text(text = stringResource(R.string.despesa))
+
         }
     }
 }
@@ -284,14 +316,8 @@ fun FormTextField(
     enabled: Boolean,
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = titulo,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
         OutlinedTextField(
             value = campoFormulario.valor,
             onValueChange = onValorAlterado,
@@ -301,7 +327,7 @@ fun FormTextField(
             enabled = enabled,
             isError = campoFormulario.contemErro,
             keyboardOptions = keyboardOptions,
-            visualTransformation = visualTransformation
+            label = { Text(titulo) }
         )
         if (campoFormulario.contemErro) {
             Text(
@@ -322,12 +348,10 @@ fun FormDatePicker(
     calendar: Calendar,
     context: android.content.Context
 ) {
-
     val datePickerDialog = remember {
         android.app.DatePickerDialog(
             context,
             { _, year, month, dayOfMonth ->
-
                 val selectedDate = String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
                 onValorAlterado(selectedDate)
             },
@@ -340,7 +364,9 @@ fun FormDatePicker(
     OutlinedTextField(
         value = campoFormulario.valor,
         onValueChange = {},
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { datePickerDialog.show() },
         readOnly = true,
         enabled = !campoFormulario.contemErro,
         label = { Text(text = stringResource(R.string.data)) },
@@ -354,6 +380,8 @@ fun FormDatePicker(
         isError = campoFormulario.contemErro
     )
 }
+
+
 
 
 @Composable

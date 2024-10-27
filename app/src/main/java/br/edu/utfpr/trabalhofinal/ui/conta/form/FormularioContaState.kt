@@ -1,5 +1,6 @@
 package br.edu.utfpr.trabalhofinal.ui.conta.form
 
+import androidx.compose.runtime.mutableStateOf
 import br.edu.utfpr.trabalhofinal.data.Conta
 
 data class CampoFormulario(
@@ -24,7 +25,7 @@ data class FormularioContaState(
     val data: CampoFormulario = CampoFormulario(),
     val valor: CampoFormulario = CampoFormulario(),
     val paga: Boolean = false,
-    val tipo: CampoFormulario = CampoFormulario()
+    val tipo: CampoFormulario = CampoFormulario(valor = "Receita")
 ) {
     val contaNova get(): Boolean = idConta <= 0
     val formularioValido get(): Boolean = descricao.valido &&

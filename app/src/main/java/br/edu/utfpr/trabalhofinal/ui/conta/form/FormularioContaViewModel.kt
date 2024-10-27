@@ -72,23 +72,52 @@ class FormularioContaViewModel(
 
     fun onDataAlterada(novaData: String) {
         if (state.data.valor != novaData) {
+            val codigoErro = validarData(novaData)
             state = state.copy(
                 data = state.data.copy(
-                    valor = novaData
+                    valor = novaData,
+                    codigoMensagemErro = codigoErro
                 )
             )
         }
     }
 
+    private fun validarData(data: String): Int {
+        return if (data.isBlank()) {
+            R.string.data_obrigatoria
+        } else {
+
+            return try {
+                LocalDate.parse(data, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                0
+            } catch (e: Exception) {
+                R.string.data_invalida
+            }
+        }
+    }
+
+
     fun onValorAlterado(novoValor: String) {
         if (state.valor.valor != novoValor) {
+            val codigoErro = validarValor(novoValor)
             state = state.copy(
                 valor = state.valor.copy(
-                    valor = novoValor
+                    valor = novoValor,
+                    codigoMensagemErro = codigoErro
                 )
             )
         }
     }
+
+    private fun validarValor(valor: String): Int {
+        return if (valor.isBlank() || valor.toBigDecimalOrNull() == null) {
+            R.string.valor_obrigatorio
+        } else {
+            0
+        }
+    }
+
+
 
     fun onStatusPagamentoAlterado(novoStatusPagamento: Boolean) {
         if (state.paga != novoStatusPagamento) {
@@ -134,10 +163,18 @@ class FormularioContaViewModel(
         state = state.copy(
             descricao = state.descricao.copy(
                 codigoMensagemErro = validarDescricao(state.descricao.valor)
+            ),
+            valor = state.valor.copy(
+                codigoMensagemErro = validarValor(state.valor.valor)
+            ),
+            data = state.data.copy(
+                codigoMensagemErro = validarData(state.data.valor)
             )
         )
         return state.formularioValido
     }
+
+
 
     fun mostrarDialogConfirmacao() {
         state = state.copy(mostrarDialogConfirmacao = true)
